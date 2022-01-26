@@ -1,0 +1,27 @@
+﻿@page "/ADM_Test3"
+@model ADM_DEV_TEST.Pages.ADM_Test3Model
+@{
+    ViewData["Title"] = "Test 3";
+}
+
+<h1>Test 3</h1>
+<h4>Escribir una función que cuente la cantidad de veces que se repite una palabra</h4>
+<div class="container">
+    <div class="row align-items-start">        
+        <form method="post">
+            <div class="col">
+                <textarea type="text" asp-for="ModelTest3.Text" placeholder="Text" > </textarea>
+            </div>
+            <div class="col">
+                <input type="text" asp-for="ModelTest3.Word" placeholder="Word" />
+            </div>
+             <div class="col">
+                 <button type="submit">Count</button>
+             </div>            
+        </form>
+        <div class="col">
+            <label for="result">Result</label>
+            <span id="result">@Model?.ModelTest3?.Result</span>
+        </div>
+    </div>
+</div>  

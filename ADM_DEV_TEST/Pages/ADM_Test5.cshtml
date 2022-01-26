@@ -1,0 +1,199 @@
+﻿@page "/ADM_Test5"
+
+@using System.Globalization
+@using ADM_DEV_TEST.Models
+
+@model ADM_DEV_TEST.Pages.ADM_Test5Model
+
+@{
+    ViewData["Title"] = "Test 5";    
+}
+
+<h1>Test 5</h1>
+<h4>Calendario de trabajo o móvil</h4>
+
+<div class="container">
+  <div class="row">
+      <div class"col>
+          <select asp-for="ModelTest5.Categories" asp-items="Html.GetEnumSelectList<Categories>()" id="slctCat">
+            <option value="0">Pick One</option>
+        </select>
+        <input type="text" id="txtnewOption"/>
+        <button type="button" id="btnAddOtion">Add option</button>
+        <button type="button" id="btnRemoveOtion">Remove selected option</button>
+      </div>
+  </div>
+  <div class="row">
+        <div class="col" id="dLegend">           
+        </div>
+    </div>
+  <div class="row flex-row">
+    @for(int m = 1; m < 13; m++)
+        {
+            string month = new DateTime(DateTime.Now.Year, m, 1).ToString("MMMM", CultureInfo.CreateSpecificCulture("en"));
+            <div class="col">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered align-middle caption-top table-responsive-stack w-auto">
+                        <caption><h4>@month</h4></caption>
+                        <thead>
+                            <tr>
+                                <th>Mo</th>
+                                <th>Tu</th>
+                                <th>We</th>
+                                <th>Th</th>
+                                <th>Fr</th>
+                                <th>Sa</th>
+                                <th>Su</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                @{
+                                    var firstDayOfTheMonth = new DateTime(DateTime.Now.Year, m, 1);
+                                    int dayOfWeek = (int)firstDayOfTheMonth.DayOfWeek == 0 ? 7 : (int)firstDayOfTheMonth.DayOfWeek;
+                                    DateTime startDate = firstDayOfTheMonth.AddDays(-dayOfWeek).AddDays(1);                                
+                                    for (int i = 0; i < DateTime.DaysInMonth(DateTime.Now.Year, m)+dayOfWeek-1; i++)
+                                    {
+                                        if (i % 7 == 0 && i > 0)
+                                        {
+                                            @:</tr><tr>
+                                        }
+                                        if (i < dayOfWeek-1)
+                                        {
+                                            <td></td>
+                                        }
+                                        else
+                                        {
+                                            DateTime date = startDate.AddDays(i);                    
+                                            <td class="text-center td-date-day" data-dayoy="@date.DayOfYear">@date.Day</td>
+                                        }                    
+                                    }
+                                }
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            if (m % 3 == 0)
+            {   
+                @:</div><div class="row flex-row">
+            }
+        }
+    </div>
+</div>
+
+
+@section Scripts{
+    <script>
+        var letters = "0123456789abcdef";
+        var color = '#';
+        $(function() {
+            $("#slctCat option").each(function()
+            {
+                if($(this).val() != '0')
+                {
+                    colorHexRndNum($(this).val());
+
+                    $("#dLegend").append('<span id="sp' + $(this).val() + '" style="padding-left:4px; background-color: ' + color + ';">' + $(this).text() + '</span>&nbsp;&nbsp;');
+
+                    color = '#';
+                }                   
+            });
+        });
+        $(".td-date-day").on('click', function () {
+            if($("#slctCat").val() != '0')
+            {
+                colorHexRndNum($("#slctCat").val());
+
+                if ($(this).hasClass("td_cat") && $(this).get(0).style.getPropertyValue("--mainCat-bg-color") == color)
+                {
+                    $(this).removeClass("td_cat");
+                }
+                else if ($(this).hasClass("td_cat") && $(this).get(0).style.getPropertyValue("--mainCat-bg-color") != color)
+                {
+                    $(this).get(0).style.setProperty("--secondCat-bg-color", color);
+                    $(this).removeClass("td_cat");
+                    $(this).addClass("td_multi_cat");
+                }
+                else if ($(this).hasClass("td_multi_cat"))
+                {
+                    if ($(this).get(0).style.getPropertyValue("--mainCat-bg-color") == color)
+                    {
+                        $(this).get(0).style.setProperty("--mainCat-bg-color", $(this).get(0).style.getPropertyValue("--secondCat-bg-color"));
+                        $(this).addClass("td_cat");
+                        $(this).removeClass("td_multi_cat");
+                    }
+                    else if ($(this).get(0).style.getPropertyValue("--secondCat-bg-color") == color)
+                    {                    
+                        $(this).addClass("td_cat");
+                        $(this).removeClass("td_multi_cat");
+                    }                                   
+                }                
+                else if($("#slctCat").val() != '')
+                {
+                    $(this).get(0).style.setProperty("--mainCat-bg-color", color);
+                    $(this).addClass("td_cat");
+                }
+            
+                color = '#';
+            }            
+        });
+
+        $("#btnAddOtion").on('click', function () {
+            if (!($("#txtnewOption").val() === null || $("#txtnewOption").val().match(/^ *$/) !== null))
+            {
+                var optText = $("#txtnewOption").val();
+                var optValue = parseInt($('#slctCat').children('option').last().val()) + 1;
+                addOption(optText,optValue);
+                $("#txtnewOption").val('');
+            }            
+        });
+
+        $("#btnRemoveOtion").on('click', function () {
+            var id = $('#slctCat option:selected').val();
+
+            colorHexRndNum(id);
+            
+            $('.td_cat,.td_multi_cat').each(function(){
+                if ($(this).get(0).style.getPropertyValue("--mainCat-bg-color") == color || $(this).get(0).style.getPropertyValue("--secondCat-bg-color") == color)
+                {
+                    if($(this).hasClass("td_cat")) 
+                    {
+                        $(this).removeClass('td_cat');   
+                    }
+                    if($(this).hasClass("td_multi_cat") && $(this).get(0).style.getPropertyValue("--secondCat-bg-color") == color)
+                    {
+                        $(this).removeClass('td_multi_cat');
+                        $(this).addClass('td_cat');
+                    }
+                    if ($(this).hasClass("td_multi_cat") && $(this).get(0).style.getPropertyValue("--mainCat-bg-color") == color)
+                    {
+                        $(this).get(0).style.setProperty("--mainCat-bg-color", $(this).get(0).style.getPropertyValue("--secondCat-bg-color"));
+                        $(this).removeClass("td_multi_cat");
+                        $(this).addClass("td_cat");
+                    }
+                }                
+            });
+
+            $('#sp'+id).remove();
+            $('#slctCat option:selected').remove();
+            
+            color = '#';
+        });
+
+        function addOption(optText,optValue) {
+            $('#slctCat').append(`<option value="${optValue}">${optText}</option>`);
+
+            colorHexRndNum(optValue);
+
+            $("#dLegend").append('<span id="sp' + optValue + '" style="padding-left:4px; background-color: ' + color + ';">' + optText + '</span>&nbsp;&nbsp;');
+
+            color = '#';
+        }
+
+        function colorHexRndNum(num){
+            for (var i = 1001; i < 1007; i++)
+                color += letters[(parseInt(num) * i)%16];
+        }
+    </script>
+}

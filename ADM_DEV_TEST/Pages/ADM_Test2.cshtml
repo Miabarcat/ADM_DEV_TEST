@@ -1,0 +1,58 @@
+﻿@page "/ADM_Test2"
+@model ADM_DEV_TEST.Pages.ADM_Test2Model
+@{
+
+    ViewData["Title"] = "Test 2";
+}
+
+<h1>Test 2</h1>
+<h4>Recupera el valor mayor dentro de un array de números con un solo FOR</h4>
+<div class="container">
+    <div class="row align-items-start">        
+        <form method="post" id="form">
+            <div class="col">
+                <input type="number" id="Num" asp-for="ModelTest2.Num" placeholder="Num" />
+                <button type="button" id="btnAddNum">Add</button>                
+                <span id="spNumList"></span>
+            </div>
+             <div class="col">                 
+                <input type="hidden" id="NumList" asp-for="ModelTest2.NumList" />    
+             </div>
+             <div class="col">
+                 <button type="submit">Max</button>
+             </div>            
+        </form>
+        <div class="col">
+            <label for="result">Result</label>
+            <span id="result">@Model?.ModelTest2?.Result</span>
+        </div>
+        <div class="col">
+            <button type="button" id="btnClear">Clear</button>
+        </div>
+    </div>
+</div> 
+
+
+
+@section Scripts{
+    <script>
+        $(function(){
+            $("#spNumList").text($("#NumList").val());
+        });
+        $("#btnAddNum").on('click',function(){            
+           
+           $("#NumList").val($("#NumList").val() == '' ? $("#Num").val() : $("#NumList").val() + "," + $("#Num").val());          
+          
+           $("#Num").val('');
+
+           $("#spNumList").text($("#NumList").val());
+        });
+
+        $("#btnClear").on('click',function(){                       
+           $("#result").text('');
+           $("#spNumList").text('');
+           $("#NumList").val('');
+           $('#form')[0].reset();
+        });
+    </script>
+}
